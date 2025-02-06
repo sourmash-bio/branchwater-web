@@ -17,7 +17,7 @@ sentry_sdk.init(
     ],
 )
 
-from functions import getacc, getmetadata, getmongo, SearchError
+from functions import getacc, getmetadata, getmongo, SearchError, markdownify
 
 
 def http_pool():
@@ -48,6 +48,9 @@ def create_app():
             metadata = getmetadata(current_app.config, http_pool())
             current_app.config.metadata = metadata
 
+        # add markdownify filter to jinja2 (imported from functions.py)
+        app.jinja_env.filters['markdownify'] = markdownify
+
     return app
 
 app = create_app()  # create flask/app instance
@@ -65,6 +68,7 @@ def teardown_mongo_client(exception):
 
     if mc is not None:
         mc.close()
+
 
 
 KSIZE = app.config.get('ksize', 21)
@@ -150,6 +154,10 @@ def advanced():
 @app.route('/about', methods=['GET', "POST"])
 def metadata():
     return render_template('about.html', n_datasets=f"{app.config.metadata['n_datasets']:,}")
+
+@app.route('/test', methods=['GET', "POST"])
+def testme():
+    return render_template("test.md")
 
 @app.route('/contact', methods=['GET', "POST"])
 def contact():

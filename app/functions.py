@@ -3,6 +3,7 @@ import io
 import os
 import gzip
 import string
+import markdown
 
 
 DEFAULT_COLUMNS = ["SRA_accession", "containment", "cANI"]
@@ -80,3 +81,8 @@ def getmongo(acc_t, meta_list, config, client):
         {'acc': {"$in": acc_t}}, meta_dict))
 
     return (query)
+
+
+def markdownify(md):
+    return markdown.markdown(md)
+
